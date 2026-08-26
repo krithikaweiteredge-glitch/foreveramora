@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { srcSet, SMALL } from '@/lib/media';
 
 /**
@@ -22,6 +22,12 @@ export default function Img({
   const [loaded, setLoaded] = useState(false);
   const ref = useRef(null);
   const jpg = src.replace(/\.webp$/, '.jpg');
+
+  useEffect(() => {
+    if (ref.current && ref.current.complete) {
+      setLoaded(true);
+    }
+  }, [src]);
 
   return (
     <picture>
