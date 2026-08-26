@@ -49,7 +49,7 @@ export default function Preserve() {
         const depth = parseFloat(p.dataset.depth);
         gsap.fromTo(
           p.firstElementChild,
-          { yPercent: 42 * depth, opacity: 0, scale: 0.86 },
+          { yPercent: 25 * depth, opacity: 0.7, scale: 0.92 },
           {
             yPercent: -34 * depth,
             opacity: 1,
