@@ -1,0 +1,27 @@
+{
+  "name": "foreveramora",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "media": "python scripts/fetch_photos.py",
+    "media:grade": "python scripts/fetch_photos.py --grade",
+    "media:sheet": "python scripts/fetch_photos.py --sheet"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.0.0",
+    "@react-three/fiber": "^9.0.0",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.20",
+    "motion": "^11.15.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.171.0"
+  }
+}

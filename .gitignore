@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.media-cache
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+__pycache__
+.claude
