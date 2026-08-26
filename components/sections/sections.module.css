@@ -75,12 +75,16 @@ a:hover .arrow {
   z-index: 2;
   left: 0;
   right: 0;
-  top: calc(var(--nav-h) + 1rem);
+  top: calc(var(--nav-h) + 3rem);
   bottom: clamp(5.5rem, 13vh, 9rem);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   will-change: transform, opacity;
+}
+
+.hero__copy > p {
+  margin-top: clamp(1.5rem, 3.5vh, 3rem);
 }
 
 .hero__h1 {
