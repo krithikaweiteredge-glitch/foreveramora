@@ -44,16 +44,17 @@ function useLayout(count) {
   }, [count]);
 }
 
-function Tile({ tex, slot, i, focused, setFocused, hovered, setHovered }) {
+function Tile({ tex, slot, i, focused, setFocused }) {
   const mesh = useRef(null);
   const mat = useRef(null);
+  const isHoverRef = useRef(false);
   const isFocus = focused === i;
-  const isHover = hovered === i;
 
   useFrame((state, dt) => {
     const m = mesh.current;
     if (!m) return;
     const t = state.clock.elapsedTime;
+    const isHover = isHoverRef.current;
 
     const drift = [
       Math.sin(t * 0.16 + slot.seed) * 0.07,
@@ -105,9 +106,11 @@ function Tile({ tex, slot, i, focused, setFocused, hovered, setHovered }) {
       renderOrder={isFocus ? 10 : 0}
       onPointerOver={(e) => {
         e.stopPropagation();
-        setHovered(i);
+        isHoverRef.current = true;
       }}
-      onPointerOut={() => setHovered((h) => (h === i ? null : h))}
+      onPointerOut={() => {
+        isHoverRef.current = false;
+      }}
       onClick={(e) => {
         e.stopPropagation();
         setFocused(isFocus ? null : i);
@@ -137,7 +140,6 @@ export default function WallScene({ quality, onFocus }) {
   const pointer = useThree((s) => s.pointer);
   const camera = useThree((s) => s.camera);
   const [focused, setFocused] = useState(null);
-  const [hovered, setHovered] = useState(null);
 
   useMemo(() => {
     textures.forEach((t) => prepTexture(t, Math.min(4, maxAniso)));
@@ -174,8 +176,6 @@ export default function WallScene({ quality, onFocus }) {
           slot={layout[i]}
           focused={focused}
           setFocused={pick}
-          hovered={hovered}
-          setHovered={setHovered}
         />
       ))}
     </>

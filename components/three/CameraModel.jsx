@@ -16,12 +16,10 @@ import { RoundedBox } from '@react-three/drei';
 /* ── materials, made once and shared by every part ─────────── */
 export function useKit(tier = 'medium') {
   return useMemo(() => {
-    const body = new THREE.MeshPhysicalMaterial({
+    const body = new THREE.MeshStandardMaterial({
       color: '#0a0a0c',
       roughness: 0.52,
       metalness: 0.30,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.38,
       envMapIntensity: 0.30,
     });
     const rubber = new THREE.MeshStandardMaterial({
@@ -67,29 +65,14 @@ export function useKit(tier = 'medium') {
       metalness: 0,
       side: THREE.DoubleSide,
     });
-    const glass =
-      tier === 'high'
-        ? new THREE.MeshPhysicalMaterial({
-            color: '#0d1a20',
-            roughness: 0.03,
-            metalness: 0.1,
-            transmission: 0.45,
-            thickness: 1.4,
-            ior: 1.72,
-            attenuationColor: new THREE.Color('#0a1a1e'),
-            attenuationDistance: 0.5,
-            envMapIntensity: 0.9,
-            clearcoat: 1,
-            clearcoatRoughness: 0.02,
-          })
-        : new THREE.MeshPhysicalMaterial({
-            color: '#0b141a',
-            roughness: 0.05,
-            metalness: 0.4,
-            envMapIntensity: 1.0,
-            clearcoat: 1,
-            clearcoatRoughness: 0.03,
-          });
+    const glass = new THREE.MeshStandardMaterial({
+      color: '#0b141a',
+      roughness: 0.05,
+      metalness: 0.4,
+      transparent: true,
+      opacity: 0.65,
+      envMapIntensity: 1.0,
+    });
     return { body, rubber, metal, dark, gold, ridge, blade, cavity, glass };
   }, [tier]);
 }
@@ -146,8 +129,8 @@ export function Aperture({ open = 0.6, blades = 9, z = 0.86, mat }) {
   useFrame(() => {
     const g = group.current;
     if (!g) return;
-    // closed → blades swing in and overlap; open → they retract into the barrel
-    const o = THREE.MathUtils.clamp(open, 0, 1);
+    const val = typeof open === 'object' && open !== null && 'current' in open ? open.current : open;
+    const o = THREE.MathUtils.clamp(val, 0, 1);
     g.children.forEach((child, i) => {
       const pivot = child;
       pivot.rotation.z = (i / blades) * Math.PI * 2;
