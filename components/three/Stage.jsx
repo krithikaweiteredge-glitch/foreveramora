@@ -25,7 +25,7 @@ export default function Stage({
 }) {
   const hostRef = useRef(null);
   const q = useQuality();
-  const near = useInView(hostRef, { margin: '120%' });
+  const near = useInView(hostRef, { margin: '20%' });
   const [dead, setDead] = useState(false);
   const [mounted, setMounted] = useState(false);
   const retries = useRef(0);
