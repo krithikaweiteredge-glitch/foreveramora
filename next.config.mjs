@@ -2,16 +2,19 @@
 const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: process.cwd(),
-  // Media is pre-optimised (WebP + JPG fallback + width variants) by
-  // scripts/generate_media.py, so we serve it directly with <img srcset>.
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', 'gsap', 'lenis'],
   images: { unoptimized: true },
   async headers() {
-    const media =
-      process.env.NODE_ENV === 'production'
-        ? 'public, max-age=31536000, immutable'
-        : 'no-store';
     return [
-      { source: '/media/:path*', headers: [{ key: 'Cache-Control', value: media }] },
+      {
+        source: '/media/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
   },
 };

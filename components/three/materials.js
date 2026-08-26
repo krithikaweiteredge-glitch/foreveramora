@@ -170,9 +170,9 @@ export { PhotoMaterial, DustMaterial, GlassMaterial };
 
 /* ── texture loading, tuned once ────────────────────────────── */
 
-export function prepTexture(t, maxAniso = 4) {
+export function prepTexture(t, maxAniso = 2) {
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = maxAniso;
+  t.anisotropy = Math.min(2, maxAniso);
   t.minFilter = THREE.LinearMipmapLinearFilter;
   t.magFilter = THREE.LinearFilter;
   t.generateMipmaps = true;
