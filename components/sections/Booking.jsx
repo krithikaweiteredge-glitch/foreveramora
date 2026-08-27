@@ -45,28 +45,59 @@ export default function Booking() {
   const submit = async (e) => {
     e.preventDefault();
     if (state === 'sending') return;
+
+    // Validate client-side
+    const missing = [];
+    if (!form.name.trim()) missing.push('name');
+    if (!form.phone.trim()) missing.push('phone');
+    if (!form.email.trim()) missing.push('email');
+    if (!form.eventType.trim()) missing.push('eventType');
+
+    if (missing.length > 0) {
+      setBad(missing);
+      setError('Please fill in all required fields marked with *');
+      setState('error');
+      return;
+    }
+
     setState('sending');
     setError('');
 
+    // Format WhatsApp message
+    const intentLabel = INTENTS.find((i) => i.id === intent)?.label ?? 'Booking Enquiry';
+    const lines = [
+      `*New ${intentLabel} — Foreveramora*`,
+      '',
+      `*Name:* ${form.name.trim()}`,
+      `*Phone:* ${form.phone.trim()}`,
+      `*Email:* ${form.email.trim()}`,
+      `*Event Type:* ${form.eventType.trim()}`,
+    ];
+    if (form.eventDate.trim()) lines.push(`*Event Date:* ${form.eventDate.trim()}`);
+    if (form.location.trim()) lines.push(`*Location:* ${form.location.trim()}`);
+    if (form.guests.trim()) lines.push(`*Guests:* ${form.guests.trim()}`);
+    if (picked.length > 0) lines.push(`*Services:* ${picked.join(', ')}`);
+    if (form.message.trim()) lines.push(`*Notes:* ${form.message.trim()}`);
+
+    const whatsappUrl = `https://wa.me/918008873388?text=${encodeURIComponent(lines.join('\n'))}`;
+
     try {
-      const res = await fetch('/api/booking', {
+      // Record enquiry via API
+      fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, services: picked, intent }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        setBad(json.fields ?? []);
-        setError(json.error ?? 'Something went wrong.');
-        setState('error');
-        return;
-      }
+      }).catch(() => {});
+
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
+
       setState('done');
       setForm(EMPTY);
       setPicked([]);
     } catch {
-      setError('Network trouble. Please email or call us directly.');
-      setState('error');
+      window.open(whatsappUrl, '_blank');
+      setState('done');
     }
   };
 
@@ -242,7 +273,7 @@ export default function Booking() {
               </Magnetic>
               <p className="body-s" role="status" aria-live="polite">
                 {state === 'done'
-                  ? 'Got it. You’ll hear from us within 24 hours — check your spam folder just in case.'
+                  ? 'Opening WhatsApp with your enquiry details… If it didn’t open automatically, click Message on WhatsApp on the right.'
                   : state === 'error'
                     ? error
                     : 'We reply to every enquiry personally, usually the same day.'}
