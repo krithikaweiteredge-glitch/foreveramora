@@ -37,10 +37,13 @@ here and local SEO follows.
 
 ### 2. `lib/content.js` — what you say
 
-Event categories and what you capture in each, the horizontal story chapters,
-the portfolio case studies, testimonials, the team, the four-step process, and
-the service list. All written as realistic copy, not lorem ipsum — edit it in
-place.
+Event categories and what you capture in each, testimonials, the team, the
+four-step experience, and the service list. All written as realistic copy, not
+lorem ipsum — edit it in place.
+
+One rule: the four-step export is called `experience`, **never `process`**. An
+import named `process` shadows Node's global inside the module and breaks the
+production build's env macro.
 
 ### 3. `lib/media.js` — what you show
 
@@ -51,22 +54,24 @@ Every image path on the site, in one manifest.
 - keep the file names and overwrite the files in `public/media/**`, or
 - point the strings in `lib/media.js` at whatever you name them.
 
-Recommended exports: `.webp` at the sizes below, plus a `.jpg` fallback and a
-small `name@450.webp` variant for `srcset`.
+Every slot ships **three files**: `name.webp` (full size), `name@480.webp`
+(the srcset variant) and `name.jpg` (the fallback). That `480` is the value of
+`SMALL` in `lib/media.js` and of `SMALL` in `scripts/fetch_photos.py` — it
+lives in exactly those two places, and they must agree or the `srcset` points
+at files that do not exist.
 
-| Folder | What it is | Size |
+| Folder | What it is | Full size |
 | --- | --- | --- |
-| `hero/` | portraits floating around the camera | 900 × 1200 |
-| `film/` | the wide frames the camera flies through | 1920 × 1080 |
+| `hero/` | portraits suspended around the camera | 900 × 1200 |
+| `film/` | the wide frames the camera flies through | 1600 × 900 |
 | `emotion/` | the "we preserve feelings" strip | 1000 × 1250 |
 | `categories/` | one cover per event type | 1200 × 1500 |
-| `chapters/` | the horizontal reel | 1800 × 1150 |
-| `portfolio/` | `<slug>.webp` cover + `<slug>-1..4.webp` | 1600 × 1100 / 1200 × 1500 |
 | `wall/` | the memory wall (48 frames) | 512 × 640 |
 | `team/` | studio portraits | 900 × 1200 |
-| `ambient/` | blurred plates behind testimonials | 1920 × 1080 |
+| `ambient/` | blurred plates behind testimonials | 1600 × 900 |
 | `lens/`, `final/` | the lens interior and the closing frame | — |
 | `og.jpg` | social share card | 1200 × 630 |
+| `chapters/`, `portfolio/` | for the parked sections (see below) | — |
 
 ### 4. Films
 
@@ -97,10 +102,15 @@ Contributors are credited in
 own work is in, delete that file.
 
 ```bash
-python scripts/fetch_photos.py           # fetch anything new, then grade
-python scripts/fetch_photos.py --grade   # re-grade the cache (tweak the look)
-python scripts/fetch_photos.py --sheet   # contact sheet, to review picks
+npm run media          # fetch anything new, then grade
+npm run media:grade    # re-grade the cache only — for tuning the look
+npm run media:sheet    # contact sheet, to review what got picked
 ```
+
+StockSnap rate-limits after a few hundred downloads. The fetch checkpoints
+after every search term and `--grade` can rebuild its manifest straight from
+`.media-cache/`, so an interrupted run is never wasted — just run it again
+later to top up.
 
 Raw downloads are cached in `.media-cache/` (git-ignored, never shipped).
 `scripts/stocksnap.py` holds the search terms; the grade itself is `grade()`
@@ -118,12 +128,33 @@ components/
   sections/          one file per section, one shared CSS module
   three/             the WebGL scenes
     Stage.jsx        mounts every canvas: tiering, in-view gating, fallbacks
+    CanvasHost.jsx   the only module importing R3F — loaded ssr:false
     CameraModel.jsx  the DSLR, built from geometry — no model download
     materials.js     the photo shader, dust, glass
   ui/                Img, mask reveals, magnetic buttons
 lib/                 studio.js · content.js · media.js · quality.js
 scripts/             the media pipeline
 ```
+
+The page runs in this order:
+
+hero → the memory corridor → *we preserve feelings* → what we capture →
+through the lens → the memory wall → testimonials → behind the lens → the
+experience → services → booking → the closing frame
+
+### Parked sections
+
+Three sections are built, styled and working but **not currently in the running
+order** — they were taken out of the page on request. To bring one back, import
+it in `components/Experience.jsx` and drop it where you want it:
+
+| File | What it is | Also needs |
+| --- | --- | --- |
+| `sections/Chapters.jsx` | the pinned horizontal story reel | a `#stories` nav entry in `lib/studio.js` |
+| `sections/Portfolio.jsx` | the draggable WebGL archive carousel + case-study panel | a `#work` nav entry |
+| `sections/PhotoFilm.jsx` | the PHOTO / FILM split with the fullscreen player | uses `chrome/FilmPlayer.jsx` |
+
+They are not imported anywhere, so they add nothing to the bundle.
 
 ### Performance
 
@@ -137,11 +168,15 @@ transmission, DPR cap, antialiasing.
 - mounts a canvas only when the section approaches the viewport,
 - pauses its render loop (`frameloop="never"`) when it leaves,
 - releases the WebGL context entirely for the heavy scenes (browsers cap live
-  contexts, and the site has five),
+  contexts, and the site has several),
 - remounts twice after a lost context before falling back,
 - shows a graded still if WebGL is unavailable or motion is reduced.
 
-Images are pre-optimised WebP with a JPG fallback and width variants, lazy by
+three.js and R3F never enter the server bundle — `CanvasHost.jsx` is the only
+module that imports them and `Stage` loads it with `ssr: false`. The homepage
+ships **173 kB** of first-load JS; the WebGL arrives only when a scene does.
+
+Images are pre-optimised WebP with a JPG fallback and a srcset variant, lazy by
 default, with only the hero eager.
 
 ### Accessibility

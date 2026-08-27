@@ -75,7 +75,7 @@ a:hover .arrow {
   z-index: 2;
   left: 0;
   right: 0;
-  top: calc(var(--nav-h) + 3rem);
+  top: calc(var(--nav-h) + 1.5rem);
   bottom: clamp(5.5rem, 13vh, 9rem);
   display: flex;
   flex-direction: column;
@@ -83,17 +83,17 @@ a:hover .arrow {
   will-change: transform, opacity;
 }
 
-.hero__copy > p {
-  margin-top: clamp(1.5rem, 3.5vh, 3rem);
-}
-
 .hero__h1 {
-  margin-top: clamp(1rem, 2.5vh, 2rem);
   max-width: 16ch;
 }
 
+.hero__tag {
+  margin-top: clamp(1.2rem, 2.5vh, 2rem);
+  color: var(--gold);
+}
+
 .hero__sub {
-  margin-top: clamp(1.4rem, 3vh, 2.4rem);
+  margin-top: clamp(1.2rem, 2.4vh, 2rem);
   max-width: 42ch;
 }
 

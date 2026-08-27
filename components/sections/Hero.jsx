@@ -95,10 +95,6 @@ export default function Hero({ ready = false }) {
         <div className={s.hero__grade} aria-hidden />
 
         <div className={`wrap ${s.hero__copy}`}>
-          <p className="eyebrow" data-hero-in>
-            {studio.address.locality} · Since {studio.founded}
-          </p>
-
           <h1 className={`display display--xl ${s.hero__h1}`}>
             {HEADLINE.map((l) => (
               <span className="mask-line" key={l}>
@@ -106,6 +102,10 @@ export default function Hero({ ready = false }) {
               </span>
             ))}
           </h1>
+
+          <p className={`eyebrow ${s.hero__tag}`} data-hero-in>
+            {studio.address.locality} · Since {studio.founded}
+          </p>
 
           <p className={`lede ${s.hero__sub}`} data-hero-in>
             Photography &amp; films crafted to turn once-in-a-lifetime moments into
